@@ -1,1 +1,2926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Champs American Fried Chicken — East Barnet Village</title>
+<style>
+  /* ============================================
+     RESET & BASE
+  ============================================ */
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  :root {
+    --black: #0a0a0a;
+    --red: #c1121f;
+    --red-dark: #8b0d16;
+    --red-glow: rgba(193,18,31,0.4);
+    --white: #f5f5f5;
+    --gold: #e8a020;
+    --grey: #1a1a1a;
+    --grey2: #222;
+    --text-muted: #888;
+    --font-display: 'Georgia', 'Times New Roman', serif;
+    --transition: cubic-bezier(0.23, 1, 0.32, 1);
+  }
 
+  html { scroll-behavior: smooth; overflow-x: hidden; }
+  
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  body.dark-mode { --black: #0a0a0a; }
+  body.light-mode {
+    --black: #f0ece8;
+    --white: #1a1a1a;
+    --grey: #e0dbd5;
+    --grey2: #d5cfc9;
+    --text-muted: #555;
+    background: var(--black);
+    color: var(--white);
+  }
+
+  /* ============================================
+     CUSTOM CURSOR
+  ============================================ */
+  .cursor {
+    position: fixed;
+    width: 12px; height: 12px;
+    background: var(--red);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99999;
+    transform: translate(-50%,-50%);
+    transition: transform 0.1s, width 0.3s var(--transition), height 0.3s var(--transition), background 0.3s;
+    mix-blend-mode: normal;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 36px; height: 36px;
+    border: 1.5px solid rgba(193,18,31,0.6);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99998;
+    transform: translate(-50%,-50%);
+    transition: transform 0.15s var(--transition), width 0.4s var(--transition), height 0.4s var(--transition), opacity 0.3s;
+  }
+  .cursor.hovered { width: 20px; height: 20px; background: var(--white); }
+  .cursor-ring.hovered { width: 56px; height: 56px; opacity: 0.4; }
+
+  @media (hover: none) { .cursor, .cursor-ring { display: none; } body { cursor: auto; } }
+
+  /* ============================================
+     LOADING SCREEN
+  ============================================ */
+  #loader {
+    position: fixed;
+    inset: 0;
+    background: var(--black);
+    z-index: 100000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.8s var(--transition), visibility 0.8s;
+  }
+  #loader.hidden { opacity: 0; visibility: hidden; }
+
+  .loader-logo-wrap {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .loader-emblem {
+    width: 100px; height: 100px;
+    position: relative;
+    margin-bottom: 24px;
+  }
+  .loader-emblem svg { width: 100%; height: 100%; }
+  
+  .loader-ring {
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    border-top-color: var(--red);
+    border-right-color: var(--red);
+    animation: spinRing 1.2s linear infinite;
+  }
+  .loader-ring2 {
+    position: absolute;
+    inset: -16px;
+    border-radius: 50%;
+    border: 1px solid transparent;
+    border-bottom-color: rgba(193,18,31,0.4);
+    animation: spinRing 2s linear infinite reverse;
+  }
+
+  @keyframes spinRing { to { transform: rotate(360deg); } }
+
+  .loader-brand {
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 900;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: var(--white);
+    animation: pulseText 1.5s ease-in-out infinite;
+  }
+  .loader-brand span { color: var(--red); }
+  .loader-sub {
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-top: 8px;
+  }
+
+  @keyframes pulseText { 0%,100%{opacity:1} 50%{opacity:0.6} }
+
+  .loader-bar-wrap {
+    width: 200px;
+    height: 2px;
+    background: rgba(255,255,255,0.1);
+    margin-top: 40px;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .loader-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--red), var(--gold));
+    width: 0%;
+    animation: loadBar 2.2s var(--transition) forwards;
+    box-shadow: 0 0 12px var(--red-glow);
+  }
+  @keyframes loadBar { to { width: 100%; } }
+
+  .loader-particles {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .loader-spark {
+    position: absolute;
+    width: 3px; height: 3px;
+    background: var(--red);
+    border-radius: 50%;
+    animation: floatSpark linear infinite;
+    opacity: 0;
+  }
+  @keyframes floatSpark {
+    0% { transform: translateY(100vh) scale(0); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 0.5; }
+    100% { transform: translateY(-20px) scale(1); opacity: 0; }
+  }
+
+  /* ============================================
+     BACKGROUND CANVAS
+  ============================================ */
+  #bgCanvas {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.6;
+  }
+
+  /* ============================================
+     NAVIGATION
+  ============================================ */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    padding: 0 5%;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background 0.4s, backdrop-filter 0.4s, box-shadow 0.4s;
+  }
+  nav.scrolled {
+    background: rgba(10,10,10,0.92);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 1px 0 rgba(193,18,31,0.2), 0 8px 32px rgba(0,0,0,0.4);
+  }
+
+  .nav-logo {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--white);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .nav-logo .logo-icon {
+    width: 36px; height: 36px;
+    background: var(--red);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    box-shadow: 0 0 16px var(--red-glow);
+    flex-shrink: 0;
+  }
+  .nav-logo span { color: var(--red); }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    list-style: none;
+  }
+  .nav-links a {
+    color: rgba(245,245,245,0.7);
+    text-decoration: none;
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 500;
+    transition: color 0.3s;
+    position: relative;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px; left: 0;
+    width: 0; height: 1px;
+    background: var(--red);
+    transition: width 0.3s var(--transition);
+    box-shadow: 0 0 8px var(--red-glow);
+  }
+  .nav-links a:hover { color: var(--white); }
+  .nav-links a:hover::after { width: 100%; }
+
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .nav-order-btn {
+    background: var(--red);
+    color: var(--white);
+    border: none;
+    padding: 10px 22px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s var(--transition);
+    box-shadow: 0 0 20px var(--red-glow);
+    text-decoration: none;
+  }
+  .nav-order-btn:hover {
+    background: #e01525;
+    box-shadow: 0 0 32px rgba(193,18,31,0.6);
+    transform: translateY(-1px);
+  }
+
+  .theme-toggle {
+    width: 36px; height: 36px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: all 0.3s;
+    color: var(--white);
+  }
+  .theme-toggle:hover { background: rgba(255,255,255,0.1); border-color: var(--red); }
+
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 4px;
+    z-index: 1001;
+  }
+  .hamburger span {
+    display: block;
+    width: 24px; height: 2px;
+    background: var(--white);
+    border-radius: 2px;
+    transition: all 0.3s var(--transition);
+  }
+  .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px,5px); }
+  .hamburger.active span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px,-5px); }
+
+  .mobile-menu {
+    position: fixed;
+    top: 0; right: -100%;
+    width: min(320px, 85vw);
+    height: 100vh;
+    background: rgba(10,10,10,0.97);
+    backdrop-filter: blur(30px);
+    z-index: 999;
+    padding: 100px 40px 40px;
+    transition: right 0.5s var(--transition);
+    border-left: 1px solid rgba(193,18,31,0.2);
+    display: flex;
+    flex-direction: column;
+  }
+  .mobile-menu.open { right: 0; }
+  .mobile-menu a {
+    color: var(--white);
+    text-decoration: none;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    transition: color 0.3s, padding-left 0.3s;
+    display: block;
+  }
+  .mobile-menu a:hover { color: var(--red); padding-left: 8px; }
+  .mobile-menu-footer {
+    margin-top: auto;
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.8;
+  }
+
+  /* ============================================
+     HERO SECTION
+  ============================================ */
+  #hero {
+    position: relative;
+    height: 100vh;
+    min-height: 600px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse 80% 60% at 60% 50%, rgba(193,18,31,0.12) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 40% at 80% 20%, rgba(232,160,32,0.06) 0%, transparent 60%),
+      linear-gradient(135deg, #0a0a0a 0%, #120808 50%, #0a0a0a 100%);
+  }
+
+  .hero-grid-overlay {
+    position: absolute;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(193,18,31,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(193,18,31,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    animation: gridDrift 20s linear infinite;
+  }
+  @keyframes gridDrift { to { transform: translate(60px, 60px); } }
+
+  .hero-image-side {
+    position: absolute;
+    right: -5%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 55%;
+    height: 90%;
+    z-index: 1;
+    overflow: hidden;
+    border-radius: 20px 0 0 20px;
+  }
+  .hero-image-side img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    filter: saturate(1.2) contrast(1.05);
+    transform: scale(1.05);
+    animation: heroImgFloat 8s ease-in-out infinite alternate;
+  }
+  @keyframes heroImgFloat { to { transform: scale(1.12) translateY(-10px); } }
+  .hero-image-side::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, var(--black) 0%, transparent 40%, transparent 80%, rgba(10,10,10,0.5) 100%);
+    z-index: 2;
+  }
+  .hero-image-side::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(10,10,10,0.6) 0%, transparent 40%);
+    z-index: 2;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 5;
+    padding: 0 5%;
+    max-width: 660px;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(193,18,31,0.15);
+    border: 1px solid rgba(193,18,31,0.4);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 24px;
+    animation: heroFadeIn 0.8s var(--transition) forwards;
+    opacity: 0;
+  }
+  .hero-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--red);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--red-glow);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{box-shadow:0 0 8px var(--red-glow)} 50%{box-shadow:0 0 20px var(--red-glow)} }
+
+  @keyframes heroFadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-headline {
+    font-size: clamp(44px, 7vw, 96px);
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -2px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: heroFadeIn 0.8s 0.15s var(--transition) forwards;
+  }
+  .hero-headline .line-red { color: var(--red); display: block; }
+  .hero-headline .line-outline {
+    -webkit-text-stroke: 1.5px rgba(245,245,245,0.4);
+    color: transparent;
+    display: block;
+  }
+
+  .hero-desc {
+    font-size: 16px;
+    color: rgba(245,245,245,0.6);
+    line-height: 1.7;
+    max-width: 440px;
+    margin-bottom: 36px;
+    opacity: 0;
+    animation: heroFadeIn 0.8s 0.3s var(--transition) forwards;
+  }
+
+  .hero-ctas {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: heroFadeIn 0.8s 0.45s var(--transition) forwards;
+  }
+
+  .btn-primary {
+    background: var(--red);
+    color: var(--white);
+    padding: 16px 32px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s var(--transition);
+    box-shadow: 0 0 32px rgba(193,18,31,0.4), 0 4px 16px rgba(0,0,0,0.3);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    transition: left 0.5s;
+  }
+  .btn-primary:hover::before { left: 100%; }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 48px rgba(193,18,31,0.6), 0 8px 24px rgba(0,0,0,0.4);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--white);
+    padding: 16px 32px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: 1px solid rgba(245,245,245,0.2);
+    cursor: pointer;
+    transition: all 0.3s var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .btn-secondary:hover {
+    border-color: var(--red);
+    color: var(--red);
+    transform: translateY(-2px);
+    background: rgba(193,18,31,0.05);
+  }
+
+  .hero-stats {
+    position: absolute;
+    bottom: 40px;
+    left: 5%;
+    right: 5%;
+    display: flex;
+    gap: 40px;
+    z-index: 5;
+    opacity: 0;
+    animation: heroFadeIn 0.8s 0.6s var(--transition) forwards;
+  }
+  .hero-stat {
+    display: flex;
+    flex-direction: column;
+  }
+  .hero-stat .num {
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--red);
+    line-height: 1;
+  }
+  .hero-stat .label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  .hero-scroll-indicator {
+    position: absolute;
+    bottom: 40px;
+    right: 5%;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    animation: heroFadeIn 0.8s 0.8s var(--transition) forwards;
+  }
+  .scroll-line {
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(to bottom, var(--red), transparent);
+    animation: scrollLinePulse 2s ease-in-out infinite;
+  }
+  @keyframes scrollLinePulse {
+    0%,100%{opacity:0.4; transform:scaleY(1)}
+    50%{opacity:1; transform:scaleY(1.1)}
+  }
+  .scroll-text {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    writing-mode: vertical-rl;
+  }
+
+  /* ============================================
+     INFO STRIP
+  ============================================ */
+  .info-strip {
+    position: relative;
+    z-index: 2;
+    background: var(--red);
+    overflow: hidden;
+    padding: 0;
+  }
+  .info-strip-inner {
+    display: flex;
+    animation: stripScroll 20s linear infinite;
+    white-space: nowrap;
+    width: max-content;
+  }
+  .info-strip-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 32px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--white);
+    flex-shrink: 0;
+  }
+  .info-strip-item .dot {
+    width: 4px; height: 4px;
+    background: rgba(255,255,255,0.5);
+    border-radius: 50%;
+  }
+  @keyframes stripScroll { to { transform: translateX(-50%); } }
+  .info-strip::before, .info-strip::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 80px;
+    z-index: 1;
+  }
+  .info-strip::before { left: 0; background: linear-gradient(90deg, var(--red), transparent); }
+  .info-strip::after { right: 0; background: linear-gradient(-90deg, var(--red), transparent); }
+
+  /* ============================================
+     SECTION BASE
+  ============================================ */
+  section {
+    position: relative;
+    z-index: 1;
+  }
+  .section-header {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+  .section-tag {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+  .section-title {
+    font-size: clamp(32px, 5vw, 64px);
+    font-weight: 900;
+    letter-spacing: -1px;
+    text-transform: uppercase;
+    line-height: 1;
+    color: var(--white);
+  }
+  .section-title span { color: var(--red); }
+  .section-line {
+    width: 60px; height: 3px;
+    background: linear-gradient(90deg, var(--red), var(--gold));
+    border-radius: 3px;
+    margin: 20px auto 0;
+    box-shadow: 0 0 12px var(--red-glow);
+  }
+
+  /* ============================================
+     FEATURES / INFO SECTION
+  ============================================ */
+  #features {
+    padding: 100px 5%;
+    background: linear-gradient(180deg, var(--black) 0%, #0d0505 100%);
+  }
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .feature-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 32px 24px;
+    transition: all 0.4s var(--transition);
+    position: relative;
+    overflow: hidden;
+  }
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--red), transparent);
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  .feature-card:hover {
+    background: rgba(193,18,31,0.06);
+    border-color: rgba(193,18,31,0.2);
+    transform: translateY(-6px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 0 40px rgba(193,18,31,0.1);
+  }
+  .feature-card:hover::before { opacity: 1; }
+  .feature-icon {
+    font-size: 36px;
+    margin-bottom: 16px;
+    display: block;
+  }
+  .feature-title {
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    color: var(--white);
+  }
+  .feature-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* Hours Card */
+  .hours-card {
+    grid-column: span 2;
+    background: rgba(193,18,31,0.08);
+    border-color: rgba(193,18,31,0.2);
+  }
+  .hours-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .hour-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 13px;
+  }
+  .hour-row .day { color: var(--text-muted); }
+  .hour-row .time { color: var(--white); font-weight: 600; }
+  .hour-row.today .day, .hour-row.today .time { color: var(--red); }
+
+  /* Payment Card */
+  .payment-methods {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+  .payment-tag {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* ============================================
+     MENU SECTION
+  ============================================ */
+  #menu {
+    padding: 100px 5%;
+    background: linear-gradient(180deg, #0d0505 0%, var(--black) 50%, #0d0505 100%);
+  }
+
+  .menu-tabs {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 48px;
+  }
+  .menu-tab {
+    padding: 10px 22px;
+    border-radius: 100px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s var(--transition);
+  }
+  .menu-tab:hover, .menu-tab.active {
+    background: var(--red);
+    border-color: var(--red);
+    color: var(--white);
+    box-shadow: 0 0 20px var(--red-glow);
+  }
+
+  .menu-panel { display: none; animation: panelFade 0.5s var(--transition); }
+  .menu-panel.active { display: block; }
+  @keyframes panelFade {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .menu-category-title {
+    font-size: 28px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    color: var(--white);
+  }
+  .menu-category-title span { color: var(--red); }
+  .menu-category-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 32px;
+  }
+
+  .menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    max-width: 1200px;
+    margin: 0 auto 60px;
+  }
+
+  .menu-item {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    transition: all 0.3s var(--transition);
+    position: relative;
+    overflow: hidden;
+  }
+  .menu-item::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(193,18,31,0.06), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .menu-item:hover {
+    border-color: rgba(193,18,31,0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+  }
+  .menu-item:hover::after { opacity: 1; }
+  .menu-item.featured {
+    background: rgba(193,18,31,0.08);
+    border-color: rgba(193,18,31,0.25);
+    grid-column: span 1;
+  }
+
+  .menu-item-info { flex: 1; }
+  .menu-item-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+  .menu-item-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+  .menu-item-price {
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--red);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .menu-item-badge {
+    display: inline-block;
+    background: var(--red);
+    color: var(--white);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 100px;
+    margin-bottom: 6px;
+  }
+
+  /* Big Deal Cards */
+  .deal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 24px;
+    max-width: 1200px;
+    margin: 0 auto 60px;
+  }
+  .deal-card {
+    background: linear-gradient(135deg, rgba(193,18,31,0.1) 0%, rgba(10,10,10,0.8) 100%);
+    border: 1px solid rgba(193,18,31,0.3);
+    border-radius: 20px;
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s var(--transition);
+  }
+  .deal-card::before {
+    content: '';
+    position: absolute;
+    top: -50%; right: -50%;
+    width: 100%; height: 100%;
+    background: radial-gradient(circle, rgba(193,18,31,0.15) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .deal-card:hover {
+    transform: translateY(-6px) scale(1.01);
+    box-shadow: 0 24px 80px rgba(193,18,31,0.2), 0 0 0 1px rgba(193,18,31,0.4);
+  }
+  .deal-card-icon { font-size: 48px; margin-bottom: 16px; display: block; }
+  .deal-card-name {
+    font-size: 22px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--white);
+    margin-bottom: 8px;
+  }
+  .deal-card-contents {
+    font-size: 13px;
+    color: rgba(245,245,245,0.7);
+    line-height: 1.7;
+    margin-bottom: 20px;
+  }
+  .deal-card-price {
+    font-size: 36px;
+    font-weight: 900;
+    color: var(--red);
+    text-shadow: 0 0 20px var(--red-glow);
+  }
+  .deal-card-price .currency { font-size: 20px; vertical-align: super; }
+
+  /* Student Deal Special */
+  .student-banner {
+    background: linear-gradient(135deg, #0d1a2e 0%, #0a1520 100%);
+    border: 1px solid rgba(100,180,255,0.2);
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+  }
+  .student-banner::before {
+    content: '🎓';
+    position: absolute;
+    right: 40px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 120px;
+    opacity: 0.08;
+  }
+  .student-banner-title {
+    font-size: 32px;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: #64b4ff;
+    margin-bottom: 8px;
+  }
+  .student-banner-sub {
+    font-size: 13px;
+    color: rgba(100,180,255,0.6);
+    margin-bottom: 24px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .student-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+  }
+  .student-item {
+    background: rgba(100,180,255,0.06);
+    border: 1px solid rgba(100,180,255,0.15);
+    border-radius: 10px;
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s;
+  }
+  .student-item:hover {
+    background: rgba(100,180,255,0.1);
+    border-color: rgba(100,180,255,0.3);
+    transform: translateY(-2px);
+  }
+  .student-item-name { font-size: 13px; color: var(--white); font-weight: 500; }
+  .student-item-price { font-size: 16px; font-weight: 900; color: #64b4ff; }
+
+  /* ============================================
+     GALLERY
+  ============================================ */
+  #gallery {
+    padding: 100px 0;
+    overflow: hidden;
+    background: linear-gradient(180deg, var(--black) 0%, #0d0505 100%);
+  }
+  #gallery .section-header { padding: 0 5%; }
+
+  .gallery-track-wrap {
+    overflow: hidden;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .gallery-track-wrap::before, .gallery-track-wrap::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 120px;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .gallery-track-wrap::before { left: 0; background: linear-gradient(90deg, var(--black), transparent); }
+  .gallery-track-wrap::after { right: 0; background: linear-gradient(-90deg, var(--black), transparent); }
+
+  .gallery-track {
+    display: flex;
+    gap: 16px;
+    animation: galleryScroll 30s linear infinite;
+    width: max-content;
+  }
+  .gallery-track.reverse { animation: galleryScrollReverse 35s linear infinite; }
+  @keyframes galleryScroll { to { transform: translateX(-50%); } }
+  @keyframes galleryScrollReverse { to { transform: translateX(50%); } }
+  .gallery-track:hover { animation-play-state: paused; }
+
+  .gallery-item {
+    width: 280px;
+    height: 200px;
+    border-radius: 16px;
+    overflow: hidden;
+    flex-shrink: 0;
+    position: relative;
+    border: 1px solid rgba(255,255,255,0.06);
+    transition: transform 0.4s var(--transition), box-shadow 0.4s;
+  }
+  .gallery-item:hover {
+    transform: scale(1.04) translateY(-4px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 30px rgba(193,18,31,0.2);
+    z-index: 1;
+  }
+  .gallery-item img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s var(--transition), filter 0.4s;
+    filter: saturate(0.9);
+  }
+  .gallery-item:hover img {
+    transform: scale(1.1);
+    filter: saturate(1.2);
+  }
+  .gallery-item-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .gallery-item:hover .gallery-item-overlay { opacity: 1; }
+
+  /* ============================================
+     REVIEWS
+  ============================================ */
+  #reviews {
+    padding: 100px 0;
+    overflow: hidden;
+    background: #0d0505;
+  }
+  #reviews .section-header { padding: 0 5%; }
+
+  .reviews-track-wrap {
+    overflow: hidden;
+    position: relative;
+  }
+  .reviews-track-wrap::before, .reviews-track-wrap::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 100px;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .reviews-track-wrap::before { left: 0; background: linear-gradient(90deg, #0d0505, transparent); }
+  .reviews-track-wrap::after { right: 0; background: linear-gradient(-90deg, #0d0505, transparent); }
+
+  .reviews-track {
+    display: flex;
+    gap: 20px;
+    animation: reviewsScroll 40s linear infinite;
+    width: max-content;
+    padding: 20px 0;
+  }
+  .reviews-track:hover { animation-play-state: paused; }
+  @keyframes reviewsScroll { to { transform: translateX(-50%); } }
+
+  .review-card {
+    width: 320px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 20px;
+    padding: 28px;
+    flex-shrink: 0;
+    transition: all 0.4s var(--transition);
+    position: relative;
+    overflow: hidden;
+  }
+  .review-card::before {
+    content: '"';
+    position: absolute;
+    top: -10px; right: 20px;
+    font-size: 120px;
+    color: rgba(193,18,31,0.08);
+    font-family: Georgia, serif;
+    line-height: 1;
+    pointer-events: none;
+  }
+  .review-card:hover {
+    background: rgba(193,18,31,0.06);
+    border-color: rgba(193,18,31,0.2);
+    transform: translateY(-6px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .review-stars {
+    display: flex;
+    gap: 3px;
+    margin-bottom: 14px;
+  }
+  .review-stars span {
+    font-size: 16px;
+    color: var(--gold);
+    text-shadow: 0 0 8px rgba(232,160,32,0.4);
+  }
+  .review-text {
+    font-size: 14px;
+    line-height: 1.7;
+    color: rgba(245,245,245,0.7);
+    margin-bottom: 20px;
+    font-style: italic;
+  }
+  .review-author {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .review-avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--red), var(--red-dark));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--white);
+    flex-shrink: 0;
+  }
+  .review-name { font-weight: 700; font-size: 14px; color: var(--white); }
+  .review-date { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  /* ============================================
+     CONTACT / FIND US
+  ============================================ */
+  #contact {
+    padding: 100px 5%;
+    background: linear-gradient(180deg, #0d0505 0%, var(--black) 100%);
+  }
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+    align-items: center;
+  }
+  .contact-info-wrap {}
+  .contact-detail {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 24px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .contact-detail-icon {
+    width: 48px; height: 48px;
+    background: rgba(193,18,31,0.1);
+    border: 1px solid rgba(193,18,31,0.2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+    transition: all 0.3s;
+  }
+  .contact-detail:hover .contact-detail-icon {
+    background: rgba(193,18,31,0.2);
+    box-shadow: 0 0 20px var(--red-glow);
+  }
+  .contact-detail-label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 4px;
+  }
+  .contact-detail-value {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--white);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  .contact-detail-value:hover { color: var(--red); }
+  .contact-detail-sub { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+  .map-placeholder {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .map-placeholder iframe {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    inset: 0;
+    border: none;
+    filter: grayscale(0.8) invert(0.9) hue-rotate(180deg) saturate(0.5);
+    opacity: 0.8;
+  }
+  .map-placeholder-inner {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 40px;
+  }
+  .map-pulse {
+    width: 60px; height: 60px;
+    background: var(--red);
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    position: relative;
+    animation: mapPulse 2s ease-in-out infinite;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+  }
+  @keyframes mapPulse {
+    0%,100%{box-shadow:0 0 0 0 rgba(193,18,31,0.4)}
+    50%{box-shadow:0 0 0 20px rgba(193,18,31,0)}
+  }
+  .map-placeholder-text { font-size: 15px; color: var(--text-muted); }
+  .map-placeholder-address { font-size: 18px; font-weight: 700; color: var(--white); margin-top: 8px; }
+
+  /* ============================================
+     SERVICES BANNER
+  ============================================ */
+  .services-banner {
+    padding: 60px 5%;
+    background: linear-gradient(135deg, rgba(193,18,31,0.08) 0%, transparent 100%);
+    border-top: 1px solid rgba(193,18,31,0.1);
+    border-bottom: 1px solid rgba(193,18,31,0.1);
+  }
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .service-item {
+    text-align: center;
+    padding: 24px 16px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 14px;
+    transition: all 0.3s var(--transition);
+  }
+  .service-item:hover {
+    background: rgba(193,18,31,0.08);
+    border-color: rgba(193,18,31,0.2);
+    transform: translateY(-4px);
+  }
+  .service-item .icon { font-size: 32px; margin-bottom: 12px; display: block; }
+  .service-item .name {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--white);
+  }
+
+  /* ============================================
+     FOOTER
+  ============================================ */
+  footer {
+    background: #050505;
+    border-top: 1px solid rgba(255,255,255,0.04);
+    padding: 60px 5% 30px;
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 48px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-bottom: 48px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .footer-brand {}
+  .footer-logo {
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .footer-logo span { color: var(--red); }
+  .footer-tagline {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.7;
+    max-width: 280px;
+    margin-bottom: 24px;
+  }
+  .footer-social {
+    display: flex;
+    gap: 12px;
+  }
+  .social-btn {
+    width: 40px; height: 40px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    color: var(--white);
+  }
+  .social-btn:hover {
+    background: var(--red);
+    border-color: var(--red);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(193,18,31,0.3);
+  }
+  .footer-col-title {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 20px;
+  }
+  .footer-links { list-style: none; }
+  .footer-links li { margin-bottom: 12px; }
+  .footer-links a {
+    font-size: 14px;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.3s, padding-left 0.3s;
+    display: block;
+  }
+  .footer-links a:hover { color: var(--white); padding-left: 6px; }
+  .footer-bottom {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-top: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .footer-bottom span { color: var(--red); }
+
+  /* ============================================
+     REVEAL ANIMATIONS
+  ============================================ */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s var(--transition), transform 0.8s var(--transition);
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-left {
+    opacity: 0;
+    transform: translateX(-40px);
+    transition: opacity 0.8s var(--transition), transform 0.8s var(--transition);
+  }
+  .reveal-left.visible { opacity: 1; transform: translateX(0); }
+  .reveal-right {
+    opacity: 0;
+    transform: translateX(40px);
+    transition: opacity 0.8s var(--transition), transform 0.8s var(--transition);
+  }
+  .reveal-right.visible { opacity: 1; transform: translateX(0); }
+
+  /* ============================================
+     SCROLL TO TOP
+  ============================================ */
+  .scroll-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 48px; height: 48px;
+    background: var(--red);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: var(--white);
+    z-index: 100;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s var(--transition);
+    box-shadow: 0 0 20px var(--red-glow);
+  }
+  .scroll-top.visible { opacity: 1; transform: translateY(0); }
+  .scroll-top:hover { transform: translateY(-3px); box-shadow: 0 0 32px rgba(193,18,31,0.6); }
+
+  /* ============================================
+     MOBILE RESPONSIVE — FULLY CUSTOM
+  ============================================ */
+  @media (max-width: 768px) {
+    /* Nav */
+    .nav-links { display: none; }
+    .nav-order-btn { display: none; }
+    .hamburger { display: flex; }
+    nav { padding: 0 20px; }
+
+    /* Hero */
+    #hero { min-height: 100svh; }
+    .hero-image-side {
+      width: 100%;
+      right: 0;
+      height: 100%;
+      border-radius: 0;
+      opacity: 0.3;
+    }
+    .hero-image-side::before {
+      background: linear-gradient(0deg, var(--black) 0%, rgba(10,10,10,0.6) 100%);
+    }
+    .hero-content { max-width: 100%; padding: 0 20px; }
+    .hero-headline { font-size: clamp(36px, 12vw, 56px); letter-spacing: -1px; }
+    .hero-desc { font-size: 15px; }
+    .hero-stats { gap: 24px; flex-wrap: wrap; }
+    .hero-scroll-indicator { display: none; }
+    .hero-ctas { flex-direction: column; width: 100%; }
+    .btn-primary, .btn-secondary { justify-content: center; width: 100%; }
+
+    /* Features */
+    #features { padding: 60px 20px; }
+    .features-grid { grid-template-columns: 1fr 1fr; }
+    .hours-card { grid-column: span 2; }
+    .hours-grid { grid-template-columns: 1fr; }
+
+    /* Services */
+    .services-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+    /* Menu */
+    #menu { padding: 60px 20px; }
+    .menu-tabs { gap: 6px; }
+    .menu-tab { padding: 8px 14px; font-size: 10px; letter-spacing: 1px; }
+    .menu-grid { grid-template-columns: 1fr; }
+    .deal-grid { grid-template-columns: 1fr; }
+    .student-items { grid-template-columns: 1fr 1fr; }
+
+    /* Gallery */
+    .gallery-item { width: 220px; height: 160px; }
+
+    /* Reviews */
+    .review-card { width: 280px; }
+
+    /* Contact */
+    #contact { padding: 60px 20px; }
+    .contact-grid { grid-template-columns: 1fr; gap: 40px; }
+    .map-placeholder { min-height: 280px; }
+
+    /* Footer */
+    footer { padding: 40px 20px 20px; }
+    .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+    .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+
+    /* Scroll top */
+    .scroll-top { bottom: 20px; right: 20px; width: 42px; height: 42px; }
+  }
+
+  @media (max-width: 480px) {
+    .features-grid { grid-template-columns: 1fr; }
+    .hours-card { grid-column: span 1; }
+    .services-grid { grid-template-columns: repeat(2, 1fr); }
+    .student-items { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr; }
+    .hero-stats .hero-stat:nth-child(n+4) { display: none; }
+  }
+
+  /* ============================================
+     LIGHT MODE OVERRIDES
+  ============================================ */
+  body.light-mode nav.scrolled {
+    background: rgba(240,236,232,0.95);
+    box-shadow: 0 1px 0 rgba(193,18,31,0.2), 0 8px 32px rgba(0,0,0,0.1);
+  }
+  body.light-mode .feature-card {
+    background: rgba(0,0,0,0.03);
+    border-color: rgba(0,0,0,0.08);
+  }
+  body.light-mode .menu-item {
+    background: rgba(0,0,0,0.03);
+    border-color: rgba(0,0,0,0.08);
+  }
+  body.light-mode .review-card {
+    background: rgba(0,0,0,0.03);
+    border-color: rgba(0,0,0,0.08);
+  }
+  body.light-mode .reviews-track-wrap::before { background: linear-gradient(90deg, #f0ece8, transparent); }
+  body.light-mode .reviews-track-wrap::after { background: linear-gradient(-90deg, #f0ece8, transparent); }
+  body.light-mode .gallery-track-wrap::before { background: linear-gradient(90deg, #f0ece8, transparent); }
+  body.light-mode .gallery-track-wrap::after { background: linear-gradient(-90deg, #f0ece8, transparent); }
+  body.light-mode .info-strip-wrap::before { background: linear-gradient(90deg, var(--red), transparent); }
+  body.light-mode footer { background: #e0dbd5; }
+  body.light-mode #reviews { background: #e8e2dc; }
+  body.light-mode #reviews .reviews-track-wrap::before { background: linear-gradient(90deg, #e8e2dc, transparent); }
+  body.light-mode #reviews .reviews-track-wrap::after { background: linear-gradient(-90deg, #e8e2dc, transparent); }
+  body.light-mode .hero-bg {
+    background: radial-gradient(ellipse 80% 60% at 60% 50%, rgba(193,18,31,0.08) 0%, transparent 70%),
+                linear-gradient(135deg, #f0ece8 0%, #e8e2dc 100%);
+  }
+  body.light-mode .text-muted { color: #666; }
+</style>
+</head>
+<body class="dark-mode">
+
+<!-- Custom Cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- Background Canvas -->
+<canvas id="bgCanvas"></canvas>
+
+<!-- Loading Screen -->
+<div id="loader">
+  <div class="loader-particles" id="loaderParticles"></div>
+  <div class="loader-logo-wrap">
+    <div class="loader-emblem">
+      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="45" fill="rgba(193,18,31,0.15)" stroke="rgba(193,18,31,0.3)" stroke-width="1"/>
+        <text x="50" y="65" text-anchor="middle" font-size="50" fill="#c1121f">🍗</text>
+      </svg>
+      <div class="loader-ring"></div>
+      <div class="loader-ring2"></div>
+    </div>
+    <div class="loader-brand"><span>CHAMPS</span></div>
+    <div class="loader-sub">American Fried Chicken · East Barnet</div>
+    <div class="loader-bar-wrap">
+      <div class="loader-bar"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Navigation -->
+<nav id="navbar">
+  <a href="#hero" class="nav-logo">
+    <div class="logo-icon">🍗</div>
+    <span>CHAMPS</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#menu">Menu</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="#reviews">Reviews</a></li>
+    <li><a href="#contact">Find Us</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
+    <a href="tel:02084492477" class="nav-order-btn">📞 Order Now</a>
+    <div class="hamburger" id="hamburger">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#menu" onclick="closeMobileMenu()">Menu</a>
+  <a href="#gallery" onclick="closeMobileMenu()">Gallery</a>
+  <a href="#reviews" onclick="closeMobileMenu()">Reviews</a>
+  <a href="#contact" onclick="closeMobileMenu()">Find Us</a>
+  <a href="tel:02084492477" onclick="closeMobileMenu()">📞 Call to Order</a>
+  <div class="mobile-menu-footer">
+    <strong style="color:var(--white)">Champs American Fried Chicken</strong><br>
+    22 Church Hill Rd, Barnet EN4 8TB<br>
+    Mon–Sat: 12pm–11pm<br>
+    Sun: 10am–11pm
+  </div>
+</div>
+
+<!-- ============================================
+     HERO
+============================================ -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid-overlay"></div>
+  <div class="hero-image-side">
+    <img src="https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=1200&q=85&auto=format&fit=crop" alt="Crispy fried chicken" loading="eager">
+  </div>
+  <div class="hero-content">
+    <div class="hero-badge">🔥 East Barnet's Finest</div>
+    <h1 class="hero-headline">
+      <span>Legendary</span>
+      <span class="line-red">Fried</span>
+      <span class="line-outline">Chicken</span>
+    </h1>
+    <p class="hero-desc">Hand-crafted, perfectly seasoned American-style fried chicken in the heart of East Barnet Village. Open late. Always fresh. Always bold.</p>
+    <div class="hero-ctas">
+      <a href="#menu" class="btn-primary">🍗 View Full Menu</a>
+      <a href="tel:02084492477" class="btn-secondary">📞 0208 449 2477</a>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <span class="num">12PM</span>
+      <span class="label">Open Daily</span>
+    </div>
+    <div class="hero-stat">
+      <span class="num">11PM</span>
+      <span class="label">Late Night</span>
+    </div>
+    <div class="hero-stat">
+      <span class="num">£4.49</span>
+      <span class="label">Meals From</span>
+    </div>
+    <div class="hero-stat">
+      <span class="num">5★</span>
+      <span class="label">Rated Local</span>
+    </div>
+  </div>
+  <div class="hero-scroll-indicator">
+    <span class="scroll-text">Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- Info Strip -->
+<div class="info-strip">
+  <div class="info-strip-inner" id="infoStrip">
+    <span class="info-strip-item">🍗 Crispy Fried Chicken <span class="dot"></span></span>
+    <span class="info-strip-item">🔥 Open Till 11PM <span class="dot"></span></span>
+    <span class="info-strip-item">📍 East Barnet Village <span class="dot"></span></span>
+    <span class="info-strip-item">🚚 Delivery Available <span class="dot"></span></span>
+    <span class="info-strip-item">🧒 Kids Menu Available <span class="dot"></span></span>
+    <span class="info-strip-item">💳 Cards & NFC Accepted <span class="dot"></span></span>
+    <span class="info-strip-item">🎓 Student Deals Available <span class="dot"></span></span>
+    <span class="info-strip-item">🍗 Crispy Fried Chicken <span class="dot"></span></span>
+    <span class="info-strip-item">🔥 Open Till 11PM <span class="dot"></span></span>
+    <span class="info-strip-item">📍 East Barnet Village <span class="dot"></span></span>
+    <span class="info-strip-item">🚚 Delivery Available <span class="dot"></span></span>
+    <span class="info-strip-item">🧒 Kids Menu Available <span class="dot"></span></span>
+    <span class="info-strip-item">💳 Cards & NFC Accepted <span class="dot"></span></span>
+    <span class="info-strip-item">🎓 Student Deals Available <span class="dot"></span></span>
+  </div>
+</div>
+
+<!-- ============================================
+     SERVICES
+============================================ -->
+<div class="services-banner">
+  <div class="services-grid reveal">
+    <div class="service-item">
+      <span class="icon">🚚</span>
+      <div class="name">Delivery</div>
+    </div>
+    <div class="service-item">
+      <span class="icon">🥡</span>
+      <div class="name">Takeaway</div>
+    </div>
+    <div class="service-item">
+      <span class="icon">🪑</span>
+      <div class="name">Dine In</div>
+    </div>
+    <div class="service-item">
+      <span class="icon">🌙</span>
+      <div class="name">Late Night</div>
+    </div>
+    <div class="service-item">
+      <span class="icon">⚡</span>
+      <div class="name">Quick Bite</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================
+     FEATURES / INFO
+============================================ -->
+<section id="features">
+  <div class="section-header reveal">
+    <span class="section-tag">Why Champs?</span>
+    <h2 class="section-title">More Than Just <span>Chicken</span></h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="features-grid" style="max-width:1200px;margin:0 auto;">
+    <div class="feature-card reveal" style="transition-delay:0.1s">
+      <span class="feature-icon">🍗</span>
+      <div class="feature-title">Crispy Every Time</div>
+      <div class="feature-desc">Our signature recipe delivers golden, crunchy chicken with juicy, tender meat inside — every single time.</div>
+    </div>
+    <div class="feature-card reveal" style="transition-delay:0.15s">
+      <span class="feature-icon">🌙</span>
+      <div class="feature-title">Open Late</div>
+      <div class="feature-desc">When the craving hits, we're here. Open until 11pm every night, including Sundays from 10am.</div>
+    </div>
+    <div class="feature-card reveal" style="transition-delay:0.2s">
+      <span class="feature-icon">💳</span>
+      <div class="feature-title">Easy Payments</div>
+      <div class="feature-desc">Credit cards, debit cards, and contactless NFC payments all accepted for your convenience.</div>
+    </div>
+    <div class="feature-card reveal" style="transition-delay:0.25s">
+      <span class="feature-icon">🧒</span>
+      <div class="feature-title">Family Friendly</div>
+      <div class="feature-desc">Dedicated kids' menu and a welcoming atmosphere — great for families and solo diners alike.</div>
+    </div>
+    <div class="hours-card feature-card reveal" style="transition-delay:0.3s">
+      <span class="feature-icon">🕐</span>
+      <div class="feature-title">Opening Hours</div>
+      <div class="hours-grid">
+        <div class="hour-row" id="hourMon">
+          <span class="day">Monday</span>
+          <span class="time">12pm – 11pm</span>
+        </div>
+        <div class="hour-row" id="hourTue">
+          <span class="day">Tuesday</span>
+          <span class="time">12pm – 11pm</span>
+        </div>
+        <div class="hour-row" id="hourWed">
+          <span class="day">Wednesday</span>
+          <span class="time">12pm – 11pm</span>
+        </div>
+        <div class="hour-row" id="hourThu">
+          <span class="day">Thursday</span>
+          <span class="time">12pm – 11pm</span>
+        </div>
+        <div class="hour-row" id="hourFri">
+          <span class="day">Friday</span>
+          <span class="time">12pm – 11pm</span>
+        </div>
+        <div class="hour-row" id="hourSat">
+          <span class="day">Saturday</span>
+          <span class="time">12pm – 11pm</span>
+        </div>
+        <div class="hour-row" id="hourSun">
+          <span class="day">Sunday</span>
+          <span class="time">10am – 11pm</span>
+        </div>
+      </div>
+    </div>
+    <div class="feature-card reveal" style="transition-delay:0.35s">
+      <span class="feature-icon">🍽️</span>
+      <div class="feature-title">Loved For</div>
+      <div class="feature-desc" style="margin-bottom:16px">The go-to spot for dinner, late-night cravings, and a satisfying quick bite in East Barnet.</div>
+      <div class="feature-title" style="margin-top:16px;margin-bottom:12px">We Accept</div>
+      <div class="payment-methods">
+        <div class="payment-tag">💳 Credit Card</div>
+        <div class="payment-tag">💳 Debit Card</div>
+        <div class="payment-tag">📲 NFC</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================
+     MENU SECTION
+============================================ -->
+<section id="menu">
+  <div class="section-header reveal">
+    <span class="section-tag">Our Menu</span>
+    <h2 class="section-title">The Full <span>Champs</span> Menu</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <!-- Menu Tabs -->
+  <div class="menu-tabs">
+    <button class="menu-tab active" data-tab="deals">🔥 Deals</button>
+    <button class="menu-tab" data-tab="meals">🍽️ Meals</button>
+    <button class="menu-tab" data-tab="specials">⭐ Specials</button>
+    <button class="menu-tab" data-tab="extras">➕ Extras</button>
+    <button class="menu-tab" data-tab="student">🎓 Student</button>
+  </div>
+
+  <!-- DEALS -->
+  <div class="menu-panel active" data-panel="deals">
+    <div style="max-width:1200px;margin:0 auto;">
+      <div class="menu-category-title"><span>🔥</span> CHAMPS DEALS</div>
+      <div class="menu-category-desc">Our best value bundles — perfect for sharing or going big solo.</div>
+      <div class="deal-grid">
+        <div class="deal-card">
+          <span class="deal-card-icon">🍗</span>
+          <div class="deal-card-name">Nuggets Deal</div>
+          <div class="deal-card-contents">6 Chicken Nuggets & Chips<br>The perfect quick bite.</div>
+          <div class="deal-card-price"><span class="currency">£</span>5.99</div>
+        </div>
+        <div class="deal-card">
+          <span class="deal-card-icon">🪣</span>
+          <div class="deal-card-name">Bargain Bucket 1</div>
+          <div class="deal-card-contents">6 pcs Chicken, 6 Wings, 4 Chips,<br>Large Coleslaw & 1.5L Bottle</div>
+          <div class="deal-card-price"><span class="currency">£</span>22.99</div>
+        </div>
+        <div class="deal-card">
+          <span class="deal-card-icon">🪣</span>
+          <div class="deal-card-name">Bargain Bucket 2</div>
+          <div class="deal-card-contents">8 pcs Chicken, 6 Wings, 4 Chips,<br>Large Coleslaw & 1.5L Bottle</div>
+          <div class="deal-card-price"><span class="currency">£</span>24.99</div>
+        </div>
+        <div class="deal-card">
+          <span class="deal-card-icon">🥗</span>
+          <div class="deal-card-name">Green Deal</div>
+          <div class="deal-card-contents">Fresh salad, coleslaw with chips.<br>Lighter, fresher — still satisfying.</div>
+          <div class="deal-card-price" style="font-size:20px;color:var(--text-muted)">Ask In Store</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MEALS -->
+  <div class="menu-panel" data-panel="meals">
+    <div style="max-width:1200px;margin:0 auto;">
+      <div class="menu-category-title"><span>🍽️</span> CHAMPS MEALS</div>
+      <div class="menu-category-desc">Complete meals served with all the good stuff. Mix and match your perfect combo.</div>
+      <div class="menu-grid">
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-badge">Meal 1</div>
+            <div class="menu-item-name">1 Pc Chicken & Chips</div>
+            <div class="menu-item-desc">Classic single piece with golden fries</div>
+          </div>
+          <div class="menu-item-price">£4.49</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-badge">Meal 2</div>
+            <div class="menu-item-name">2 Pc Chicken & Chips</div>
+            <div class="menu-item-desc">Two pieces of perfectly seasoned chicken with chips</div>
+          </div>
+          <div class="menu-item-price">£5.99</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-badge">Meal 3</div>
+            <div class="menu-item-name">3 Pc Chicken & Chips</div>
+            <div class="menu-item-desc">Three generous pieces with golden chips</div>
+          </div>
+          <div class="menu-item-price">£6.99</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-badge">Meal 4</div>
+            <div class="menu-item-name">4 Pc Chicken & Chips</div>
+            <div class="menu-item-desc">Four pieces with crispy chips — go big</div>
+          </div>
+          <div class="menu-item-price">£7.99</div>
+        </div>
+        <div class="menu-item featured">
+          <div class="menu-item-info">
+            <div class="menu-item-badge" style="background:var(--gold)">Meal 5 ⭐</div>
+            <div class="menu-item-name">1 Pc Chicken, 3 Hot Wings, Chips & Drink</div>
+            <div class="menu-item-desc">Chicken + hot wings + chips + soft drink combo</div>
+          </div>
+          <div class="menu-item-price">£6.99</div>
+        </div>
+        <div class="menu-item featured">
+          <div class="menu-item-info">
+            <div class="menu-item-badge" style="background:var(--gold)">Meal 6 ⭐</div>
+            <div class="menu-item-name">2 Pc Chicken, 3 Hot Wings, Chips & Drink</div>
+            <div class="menu-item-desc">2 pieces + hot wings + chips + drink</div>
+          </div>
+          <div class="menu-item-price">£7.99</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-badge">Meal 7</div>
+            <div class="menu-item-name">3 Pc Chicken, 3 Hot Wings, Chips & Drink</div>
+            <div class="menu-item-desc">3 pieces + hot wings + chips + drink — the full meal</div>
+          </div>
+          <div class="menu-item-price">£8.99</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-badge">Meal 8</div>
+            <div class="menu-item-name">5 Hot Wings, Chips & Drink</div>
+            <div class="menu-item-desc">Five fiery wings with chips and a soft drink</div>
+          </div>
+          <div class="menu-item-price">£6.90</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-badge">Meal 9</div>
+            <div class="menu-item-name">Chicken Burger & Chips</div>
+            <div class="menu-item-desc">Juicy chicken burger in a soft bun with golden chips</div>
+          </div>
+          <div class="menu-item-price">£5.99</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-badge">Meal 10</div>
+            <div class="menu-item-name">Veggie Burger & Chips</div>
+            <div class="menu-item-desc">Delicious veggie patty in a soft bun with chips</div>
+          </div>
+          <div class="menu-item-price">£4.99</div>
+        </div>
+        <div class="menu-item featured">
+          <div class="menu-item-info">
+            <div class="menu-item-badge" style="background:var(--gold)">Meal 11 ⭐</div>
+            <div class="menu-item-name">Chicken Burger, Chips, Drink + Coleslaw or Beans</div>
+            <div class="menu-item-desc">Full chicken burger combo — choose your side</div>
+          </div>
+          <div class="menu-item-price">£7.90</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-badge">Meal 12</div>
+            <div class="menu-item-name">Chicken Wrap</div>
+            <div class="menu-item-desc">Freshly prepared chicken wrap — light and satisfying</div>
+          </div>
+          <div class="menu-item-price">£5.99</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-badge">Meal 13</div>
+            <div class="menu-item-name">3 Ribs + 3 Wings OR 1 Pc Chicken + Chips & Drink</div>
+            <div class="menu-item-desc">Your choice — ribs & wings or classic chicken with chips & drink</div>
+          </div>
+          <div class="menu-item-price" style="font-size:14px;color:var(--text-muted)">Ask In Store</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-badge">Meal 14</div>
+            <div class="menu-item-name">4 Ribs</div>
+            <div class="menu-item-desc">Four tender, slow-cooked ribs</div>
+          </div>
+          <div class="menu-item-price" style="font-size:14px;color:var(--text-muted)">Ask In Store</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-badge">Meal 15</div>
+            <div class="menu-item-name">Quarter Pounder + Chips & Drink</div>
+            <div class="menu-item-desc">Thick quarter-pound burger with chips and a drink</div>
+          </div>
+          <div class="menu-item-price">£6.99</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-badge">Meal 16</div>
+            <div class="menu-item-name">Cheese or Lamb Burger + Chips & Drink</div>
+            <div class="menu-item-desc">Hearty cheese or lamb burger with chips and drink</div>
+          </div>
+          <div class="menu-item-price" style="font-size:14px;color:var(--text-muted)">Ask In Store</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPECIALS -->
+  <div class="menu-panel" data-panel="specials">
+    <div style="max-width:1200px;margin:0 auto;">
+      <div class="menu-category-title"><span>⭐</span> CHAMPS SPECIALS</div>
+      <div class="menu-category-desc">Our signature specials — the ultimate Champs feast experience.</div>
+      <div class="deal-grid">
+        <div class="deal-card">
+          <span class="deal-card-icon">🌟</span>
+          <div class="deal-card-name">Champs Special 1</div>
+          <div class="deal-card-contents">6 pcs Chicken, 4 Chips,<br>Large Coleslaw or Beans + Drink<br>The essential family special.</div>
+          <div class="deal-card-price"><span class="currency">£</span>18.99</div>
+        </div>
+        <div class="deal-card">
+          <span class="deal-card-icon">💫</span>
+          <div class="deal-card-name">Champs Special 2</div>
+          <div class="deal-card-contents">8 pcs Chicken, 4 Chips,<br>Large Coleslaw or Beans + Drink<br>Go bigger with Special 2.</div>
+          <div class="deal-card-price"><span class="currency">£</span>21.99</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXTRAS -->
+  <div class="menu-panel" data-panel="extras">
+    <div style="max-width:1200px;margin:0 auto;">
+      <div class="menu-category-title"><span>➕</span> CHAMPS EXTRAS</div>
+      <div class="menu-category-desc">Build your meal exactly how you like it with our à la carte extras.</div>
+      <div class="menu-grid">
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-name">1 Pc Chicken</div>
+            <div class="menu-item-desc">Single piece of our signature fried chicken</div>
+          </div>
+          <div class="menu-item-price">£2.29</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-name">2 Pc Chicken</div>
+            <div class="menu-item-desc">Two pieces of golden crispy chicken</div>
+          </div>
+          <div class="menu-item-price">£3.99</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-name">3 Pc Chicken</div>
+            <div class="menu-item-desc">Three pieces of our signature chicken</div>
+          </div>
+          <div class="menu-item-price">£4.99</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-name">4 Pc Chicken</div>
+            <div class="menu-item-desc">Four pieces of perfectly seasoned fried chicken</div>
+          </div>
+          <div class="menu-item-price">£5.99</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-name">4 Wings</div>
+            <div class="menu-item-desc">Four crispy chicken wings</div>
+          </div>
+          <div class="menu-item-price">£2.90</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-name">Chips</div>
+            <div class="menu-item-desc">Golden crispy fries</div>
+          </div>
+          <div class="menu-item-price">£2.90</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-name">Soft Drink</div>
+            <div class="menu-item-desc">Refreshing soft drink — range of options available</div>
+          </div>
+          <div class="menu-item-price">£1.20</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-name">Coleslaw</div>
+            <div class="menu-item-desc">Creamy house-made coleslaw</div>
+          </div>
+          <div class="menu-item-price">£1.50</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-name">Chicken Sauce</div>
+            <div class="menu-item-desc">Signature house chicken sauce</div>
+          </div>
+          <div class="menu-item-price">£1.50</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-name">Beans</div>
+            <div class="menu-item-desc">Rich baked beans — great side</div>
+          </div>
+          <div class="menu-item-price">£1.50</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <div class="menu-item-name">Corn on the Cob</div>
+            <div class="menu-item-desc">Sweet roasted corn on the cob</div>
+          </div>
+          <div class="menu-item-price" style="font-size:14px;color:var(--text-muted)">Ask In Store</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STUDENT -->
+  <div class="menu-panel" data-panel="student">
+    <div style="max-width:1200px;margin:0 auto;">
+      <div class="student-banner">
+        <div class="student-banner-title">Student Deal 🎓</div>
+        <div class="student-banner-sub">Show your student ID · Save big · Eat well</div>
+        <div class="student-items">
+          <div class="student-item">
+            <div class="student-item-name">Chicken Sandwich + Chips + Drink</div>
+            <div class="student-item-price">£4.99</div>
+          </div>
+          <div class="student-item">
+            <div class="student-item-name">4 Spicy Hot Wings + Chips + Drink</div>
+            <div class="student-item-price">£4.99</div>
+          </div>
+          <div class="student-item">
+            <div class="student-item-name">1 Piece Chicken + Chips + Drink</div>
+            <div class="student-item-price">£4.99</div>
+          </div>
+          <div class="student-item">
+            <div class="student-item-name">Chips Only</div>
+            <div class="student-item-price">£2.50</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================
+     GALLERY
+============================================ -->
+<section id="gallery">
+  <div class="section-header reveal">
+    <span class="section-tag">The Experience</span>
+    <h2 class="section-title">Taste It <span>Visually</span></h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="gallery-track-wrap" style="margin-bottom:16px">
+    <div class="gallery-track">
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1606755962773-d324e0a13086?w=600&q=80&auto=format&fit=crop" alt="Fried chicken"><div class="gallery-item-overlay"></div></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1562967914-608f82629710?w=600&q=80&auto=format&fit=crop" alt="Chicken wings"><div class="gallery-item-overlay"></div></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1588347818036-563b64da1c7a?w=600&q=80&auto=format&fit=crop" alt="Chicken burger"><div class="gallery-item-overlay"></div></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=600&q=80&auto=format&fit=crop" alt="Bucket of chicken"><div class="gallery-item-overlay"></div></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&q=80&auto=format&fit=crop" alt="Burger close up"><div class="gallery-item-overlay"></div></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=600&q=80&auto=format&fit=crop" alt="Hot wings"><div class="gallery-item-overlay"></div></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=600&q=80&auto=format&fit=crop" alt="Chicken and chips"><div class="gallery-item-overlay"></div></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1606755962773-d324e0a13086?w=600&q=80&auto=format&fit=crop" alt="Fried chicken 2"><div class="gallery-item-overlay"></div></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1562967914-608f82629710?w=600&q=80&auto=format&fit=crop" alt="Wings 2"><div class="gallery-item-overlay"></div></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1588347818036-563b64da1c7a?w=600&q=80&auto=format&fit=crop" alt="Burger 2"><div class="gallery-item-overlay"></div></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=600&q=80&auto=format&fit=crop" alt="Bucket 2"><div class="gallery-item-overlay"></div></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&q=80&auto=format&fit=crop" alt="Burger 3"><div class="gallery-item-overlay"></div></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=600&q=80&auto=format&fit=crop" alt="Wings 3"><div class="gallery-item-overlay"></div></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=600&q=80&auto=format&fit=crop" alt="Chips 2"><div class="gallery-item-overlay"></div></div>
+    </div>
+  </div>
+
+  <div class="gallery-track-wrap">
+    <div class="gallery-track reverse">
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=600&q=80&auto=format&fit=crop" alt="Chips"><div class="gallery-item-overlay"></div></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=600&q=80&auto=format&fit=crop" alt="Hot wings b"><div class="gallery-item-overlay"></div></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&q=80&auto=format&fit=crop" alt="Burger b"><div class="gallery-item-overlay"></div></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=600&q=80&auto=format&fit=crop" alt="Bucket b"><div class="gallery-item-overlay"></div></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1588347818036-563b64da1c7a?w=600&q=80&auto=format&fit=crop" alt="Burger close b"><div class="gallery-item-overlay"></div></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1562967914-608f82629710?w=600&q=80&auto=format&fit=crop" alt="Wings b"><div class="gallery-item-overlay"></div></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1606755962773-d324e0a13086?w=600&q=80&auto=format&fit=crop" alt="FC b"><div class="gallery-item-overlay"></div></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=600&q=80&auto=format&fit=crop" alt="Chips b"><div class="gallery-item-overlay"></div></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=600&q=80&auto=format&fit=crop" alt="Wings c"><div class="gallery-item-overlay"></div></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&q=80&auto=format&fit=crop" alt="Burger c"><div class="gallery-item-overlay"></div></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=600&q=80&auto=format&fit=crop" alt="Bucket c"><div class="gallery-item-overlay"></div></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1588347818036-563b64da1c7a?w=600&q=80&auto=format&fit=crop" alt="Burger c2"><div class="gallery-item-overlay"></div></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1562967914-608f82629710?w=600&q=80&auto=format&fit=crop" alt="Wings c2"><div class="gallery-item-overlay"></div></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1606755962773-d324e0a13086?w=600&q=80&auto=format&fit=crop" alt="FC c"><div class="gallery-item-overlay"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================
+     REVIEWS
+============================================ -->
+<section id="reviews">
+  <div class="section-header reveal">
+    <span class="section-tag">Google Reviews</span>
+    <h2 class="section-title">What People <span>Say</span></h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="reviews-track-wrap">
+    <div class="reviews-track">
+      <div class="review-card">
+        <div class="review-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+        <p class="review-text">"Best fried chicken in North London without a doubt. The bargain bucket is incredible value and the chicken is always hot and crispy. Will keep coming back!"</p>
+        <div class="review-author">
+          <div class="review-avatar">JK</div>
+          <div>
+            <div class="review-name">James K.</div>
+            <div class="review-date">2 weeks ago · Google</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+        <p class="review-text">"The hot wings here are absolutely on fire — in the best way possible. Perfect seasoning, great portion sizes and the staff are always friendly. Local gem!"</p>
+        <div class="review-author">
+          <div class="review-avatar">SM</div>
+          <div>
+            <div class="review-name">Sarah M.</div>
+            <div class="review-date">1 month ago · Google</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+        <p class="review-text">"Discovered Champs last year and it's become a weekly ritual. The chicken burger meal is outstanding for the price. Late night hours are a lifesaver too."</p>
+        <div class="review-author">
+          <div class="review-avatar">DR</div>
+          <div>
+            <div class="review-name">Daniel R.</div>
+            <div class="review-date">3 weeks ago · Google</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+        <p class="review-text">"Took the whole family and everyone loved it. Kids absolutely demolished their meals. The coleslaw is creamy and delicious. Prices are very reasonable for East Barnet."</p>
+        <div class="review-author">
+          <div class="review-avatar">LC</div>
+          <div>
+            <div class="review-name">Laura C.</div>
+            <div class="review-date">1 week ago · Google</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+        <p class="review-text">"The student deal is insane value. Chicken sandwich, chips and drink for under a fiver?! Always come here after lectures. Fresh, hot and never disappoints."</p>
+        <div class="review-author">
+          <div class="review-avatar">OA</div>
+          <div>
+            <div class="review-name">Omar A.</div>
+            <div class="review-date">5 days ago · Google</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+        <p class="review-text">"Ordered delivery and it arrived in perfect condition — still crispy! The Champs Special is legendary. This place deserves way more recognition. Highly recommend."</p>
+        <div class="review-author">
+          <div class="review-avatar">PW</div>
+          <div>
+            <div class="review-name">Priya W.</div>
+            <div class="review-date">2 months ago · Google</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+        <p class="review-text">"Genuinely the crispiest chicken I've had outside of America. The seasoning blend is unique and addictive. Staff are efficient and the place is always clean. Top marks!"</p>
+        <div class="review-author">
+          <div class="review-avatar">MH</div>
+          <div>
+            <div class="review-name">Marcus H.</div>
+            <div class="review-date">3 months ago · Google</div>
+          </div>
+        </div>
+      </div>
+      <!-- Duplicate for loop -->
+      <div class="review-card">
+        <div class="review-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+        <p class="review-text">"Best fried chicken in North London without a doubt. The bargain bucket is incredible value and the chicken is always hot and crispy. Will keep coming back!"</p>
+        <div class="review-author">
+          <div class="review-avatar">JK</div>
+          <div>
+            <div class="review-name">James K.</div>
+            <div class="review-date">2 weeks ago · Google</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+        <p class="review-text">"The hot wings here are absolutely on fire — in the best way possible. Perfect seasoning, great portion sizes and the staff are always friendly. Local gem!"</p>
+        <div class="review-author">
+          <div class="review-avatar">SM</div>
+          <div>
+            <div class="review-name">Sarah M.</div>
+            <div class="review-date">1 month ago · Google</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+        <p class="review-text">"Discovered Champs last year and it's become a weekly ritual. The chicken burger meal is outstanding for the price. Late night hours are a lifesaver too."</p>
+        <div class="review-author">
+          <div class="review-avatar">DR</div>
+          <div>
+            <div class="review-name">Daniel R.</div>
+            <div class="review-date">3 weeks ago · Google</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+        <p class="review-text">"Took the whole family and everyone loved it. Kids absolutely demolished their meals. The coleslaw is creamy and delicious. Prices are very reasonable for East Barnet."</p>
+        <div class="review-author">
+          <div class="review-avatar">LC</div>
+          <div>
+            <div class="review-name">Laura C.</div>
+            <div class="review-date">1 week ago · Google</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+        <p class="review-text">"The student deal is insane value. Chicken sandwich, chips and drink for under a fiver?! Always come here after lectures. Fresh, hot and never disappoints."</p>
+        <div class="review-author">
+          <div class="review-avatar">OA</div>
+          <div>
+            <div class="review-name">Omar A.</div>
+            <div class="review-date">5 days ago · Google</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+        <p class="review-text">"Ordered delivery and it arrived in perfect condition — still crispy! The Champs Special is legendary. This place deserves way more recognition. Highly recommend."</p>
+        <div class="review-author">
+          <div class="review-avatar">PW</div>
+          <div>
+            <div class="review-name">Priya W.</div>
+            <div class="review-date">2 months ago · Google</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+        <p class="review-text">"Genuinely the crispiest chicken I've had outside of America. The seasoning blend is unique and addictive. Staff are efficient and the place is always clean. Top marks!"</p>
+        <div class="review-author">
+          <div class="review-avatar">MH</div>
+          <div>
+            <div class="review-name">Marcus H.</div>
+            <div class="review-date">3 months ago · Google</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================
+     CONTACT
+============================================ -->
+<section id="contact">
+  <div class="section-header reveal">
+    <span class="section-tag">Visit Us</span>
+    <h2 class="section-title">Find <span>Champs</span></h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="contact-grid" style="max-width:1200px;margin:0 auto;">
+    <div class="contact-info-wrap reveal-left">
+      <div class="contact-detail">
+        <div class="contact-detail-icon">📍</div>
+        <div>
+          <div class="contact-detail-label">Address</div>
+          <div class="contact-detail-value">22 Church Hill Rd</div>
+          <div class="contact-detail-sub">Barnet EN4 8TB · East Barnet Village, North London</div>
+        </div>
+      </div>
+      <div class="contact-detail">
+        <div class="contact-detail-icon">📞</div>
+        <div>
+          <div class="contact-detail-label">Phone</div>
+          <a href="tel:02084492477" class="contact-detail-value">0208 449 2477</a>
+          <div class="contact-detail-sub">Call us to order or enquire</div>
+        </div>
+      </div>
+      <div class="contact-detail">
+        <div class="contact-detail-icon">🕐</div>
+        <div>
+          <div class="contact-detail-label">Opening Hours</div>
+          <div class="contact-detail-value">Mon – Sat: 12pm – 11pm</div>
+          <div class="contact-detail-sub">Sunday: 10am – 11pm</div>
+        </div>
+      </div>
+      <div class="contact-detail">
+        <div class="contact-detail-icon">🚚</div>
+        <div>
+          <div class="contact-detail-label">Services</div>
+          <div class="contact-detail-value">Delivery · Takeaway · Dine In</div>
+          <div class="contact-detail-sub">Multiple ways to enjoy Champs</div>
+        </div>
+      </div>
+      <div style="margin-top:32px">
+        <a href="tel:02084492477" class="btn-primary" style="display:inline-flex">📞 Call to Order</a>
+      </div>
+    </div>
+    <div class="reveal-right">
+      <div class="map-placeholder">
+        <div class="map-placeholder-inner">
+          <div class="map-pulse">📍</div>
+          <div class="map-placeholder-text">Champs American Fried Chicken</div>
+          <div class="map-placeholder-address">22 Church Hill Rd, Barnet EN4 8TB</div>
+          <br>
+          <a href="https://maps.google.com/?q=22+Church+Hill+Rd+Barnet+EN4+8TB" target="_blank" rel="noopener" class="btn-primary" style="margin-top:16px;display:inline-flex;font-size:12px;padding:12px 24px">
+            🗺️ Open in Google Maps
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================
+     FOOTER
+============================================ -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="footer-logo">CHAMPS <span>🍗</span></div>
+      <div class="footer-tagline">East Barnet Village's premier American fried chicken destination. Serving legendary chicken since day one. Open daily for delivery, takeaway and dine-in.</div>
+      <div class="footer-social">
+        <a href="#" class="social-btn" title="Facebook">📘</a>
+        <a href="#" class="social-btn" title="Instagram">📸</a>
+        <a href="#" class="social-btn" title="WhatsApp">💬</a>
+        <a href="tel:02084492477" class="social-btn" title="Call us">📞</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Menu</div>
+      <ul class="footer-links">
+        <li><a href="#menu" onclick="setTab('deals')">Deals</a></li>
+        <li><a href="#menu" onclick="setTab('meals')">Meals</a></li>
+        <li><a href="#menu" onclick="setTab('specials')">Specials</a></li>
+        <li><a href="#menu" onclick="setTab('extras')">Extras</a></li>
+        <li><a href="#menu" onclick="setTab('student')">Student Deals</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Hours</div>
+      <ul class="footer-links">
+        <li><a href="#">Mon–Sat: 12pm–11pm</a></li>
+        <li><a href="#">Sunday: 10am–11pm</a></li>
+        <li><a href="#">Late Night Available</a></li>
+        <li><a href="#">Dine In Welcome</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Contact</div>
+      <ul class="footer-links">
+        <li><a href="tel:02084492477">0208 449 2477</a></li>
+        <li><a href="#">22 Church Hill Rd</a></li>
+        <li><a href="#">Barnet EN4 8TB</a></li>
+        <li><a href="https://maps.google.com/?q=22+Church+Hill+Rd+Barnet+EN4+8TB" target="_blank">Get Directions</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div>© 2025 <span>Champs American Fried Chicken</span> · East Barnet Village, North London</div>
+    <div>22 Church Hill Rd, Barnet EN4 8TB · <a href="tel:02084492477" style="color:var(--red);text-decoration:none">0208 449 2477</a></div>
+  </div>
+</footer>
+
+<!-- Scroll to Top -->
+<button class="scroll-top" id="scrollTop" title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<!-- ============================================
+     JAVASCRIPT
+============================================ -->
+<script>
+(function() {
+  'use strict';
+
+  /* ============================================
+     LOADER
+  ============================================ */
+  function createLoaderSparks() {
+    const container = document.getElementById('loaderParticles');
+    for (let i = 0; i < 20; i++) {
+      const spark = document.createElement('div');
+      spark.className = 'loader-spark';
+      spark.style.cssText = `
+        left: ${Math.random() * 100}%;
+        animation-duration: ${2 + Math.random() * 3}s;
+        animation-delay: ${Math.random() * 2}s;
+        width: ${2 + Math.random() * 3}px;
+        height: ${2 + Math.random() * 3}px;
+        opacity: ${0.3 + Math.random() * 0.7};
+      `;
+      container.appendChild(spark);
+    }
+  }
+  createLoaderSparks();
+
+  window.addEventListener('load', function() {
+    setTimeout(function() {
+      const loader = document.getElementById('loader');
+      loader.classList.add('hidden');
+      setTimeout(function() { loader.style.display = 'none'; }, 800);
+    }, 2400);
+  });
+
+  /* ============================================
+     BACKGROUND CANVAS — PARTICLES
+  ============================================ */
+  const canvas = document.getElementById('bgCanvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  let mouseX = 0, mouseY = 0;
+  let animId;
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  function createParticle() {
+    return {
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      size: Math.random() * 2 + 0.5,
+      speedX: (Math.random() - 0.5) * 0.4,
+      speedY: (Math.random() - 0.5) * 0.4,
+      opacity: Math.random() * 0.4 + 0.05,
+      color: Math.random() > 0.7 ? '#c1121f' : '#ffffff',
+      pulse: Math.random() * Math.PI * 2,
+    };
+  }
+
+  for (let i = 0; i < 80; i++) { particles.push(createParticle()); }
+
+  function drawParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Ambient glow
+    const grd = ctx.createRadialGradient(
+      canvas.width * 0.65, canvas.height * 0.5, 0,
+      canvas.width * 0.65, canvas.height * 0.5, canvas.width * 0.5
+    );
+    grd.addColorStop(0, 'rgba(193,18,31,0.04)');
+    grd.addColorStop(1, 'transparent');
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    particles.forEach((p, i) => {
+      p.pulse += 0.02;
+      p.opacity = (Math.sin(p.pulse) * 0.15 + 0.15);
+      p.x += p.speedX;
+      p.y += p.speedY;
+
+      // Mouse repel
+      const dx = p.x - mouseX;
+      const dy = p.y - mouseY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 100) {
+        p.x += dx * 0.02;
+        p.y += dy * 0.02;
+      }
+
+      if (p.x < 0) p.x = canvas.width;
+      if (p.x > canvas.width) p.x = 0;
+      if (p.y < 0) p.y = canvas.height;
+      if (p.y > canvas.height) p.y = 0;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fillStyle = p.color === '#c1121f'
+        ? `rgba(193,18,31,${p.opacity})`
+        : `rgba(245,245,245,${p.opacity * 0.3})`;
+      ctx.fill();
+
+      // Connect nearby particles
+      for (let j = i + 1; j < particles.length; j++) {
+        const p2 = particles[j];
+        const dx2 = p.x - p2.x;
+        const dy2 = p.y - p2.y;
+        const d2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+        if (d2 < 80) {
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(p2.x, p2.y);
+          ctx.strokeStyle = `rgba(193,18,31,${0.04 * (1 - d2/80)})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    });
+
+    animId = requestAnimationFrame(drawParticles);
+  }
+  drawParticles();
+
+  document.addEventListener('mousemove', function(e) {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+  });
+
+  /* ============================================
+     CUSTOM CURSOR
+  ============================================ */
+  const cursor = document.getElementById('cursor');
+  const cursorRing = document.getElementById('cursorRing');
+  let cx = 0, cy = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', function(e) {
+    cx = e.clientX; cy = e.clientY;
+    cursor.style.left = cx + 'px';
+    cursor.style.top = cy + 'px';
+  });
+
+  function animateCursorRing() {
+    rx += (cx - rx) * 0.12;
+    ry += (cy - ry) * 0.12;
+    cursorRing.style.left = rx + 'px';
+    cursorRing.style.top = ry + 'px';
+    requestAnimationFrame(animateCursorRing);
+  }
+  animateCursorRing();
+
+  const hoverEls = document.querySelectorAll('a, button, .menu-tab, .menu-item, .deal-card, .gallery-item, .review-card, .feature-card');
+  hoverEls.forEach(el => {
+    el.addEventListener('mouseenter', function() {
+      cursor.classList.add('hovered');
+      cursorRing.classList.add('hovered');
+    });
+    el.addEventListener('mouseleave', function() {
+      cursor.classList.remove('hovered');
+      cursorRing.classList.remove('hovered');
+    });
+  });
+
+  /* ============================================
+     NAVIGATION
+  ============================================ */
+  const navbar = document.getElementById('navbar');
+  let lastScroll = 0;
+  window.addEventListener('scroll', function() {
+    const scrollY = window.scrollY;
+    if (scrollY > 60) {
+      navbar.classList.add('scrolled');
+    } else {
+      navbar.classList.remove('scrolled');
+    }
+    lastScroll = scrollY;
+  }, { passive: true });
+
+  // Hamburger
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  hamburger.addEventListener('click', function() {
+    hamburger.classList.toggle('active');
+    mobileMenu.classList.toggle('open');
+    document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+  });
+
+  window.closeMobileMenu = function() {
+    hamburger.classList.remove('active');
+    mobileMenu.classList.remove('open');
+    document.body.style.overflow = '';
+  };
+
+  /* ============================================
+     MENU TABS
+  ============================================ */
+  const tabs = document.querySelectorAll('.menu-tab');
+  const panels = document.querySelectorAll('.menu-panel');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', function() {
+      const target = this.dataset.tab;
+      tabs.forEach(t => t.classList.remove('active'));
+      panels.forEach(p => { p.classList.remove('active'); p.style.display = 'none'; });
+      this.classList.add('active');
+      const panel = document.querySelector(`[data-panel="${target}"]`);
+      if (panel) { panel.style.display = 'block'; panel.classList.add('active'); }
+    });
+  });
+
+  // Init panel display
+  panels.forEach(p => { if (!p.classList.contains('active')) p.style.display = 'none'; });
+
+  window.setTab = function(tabName) {
+    const tab = document.querySelector(`[data-tab="${tabName}"]`);
+    if (tab) tab.click();
+  };
+
+  /* ============================================
+     THEME TOGGLE
+  ============================================ */
+  const themeToggle = document.getElementById('themeToggle');
+  let isDark = true;
+  themeToggle.addEventListener('click', function() {
+    isDark = !isDark;
+    document.body.className = isDark ? 'dark-mode' : 'light-mode';
+    themeToggle.textContent = isDark ? '🌙' : '☀️';
+  });
+
+  /* ============================================
+     SCROLL REVEAL
+  ============================================ */
+  const revealEls = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+  const revealObserver = new IntersectionObserver(function(entries) {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+  revealEls.forEach(el => revealObserver.observe(el));
+
+  /* ============================================
+     MENU ITEM MOUSE EFFECT
+  ============================================ */
+  document.querySelectorAll('.menu-item').forEach(item => {
+    item.addEventListener('mousemove', function(e) {
+      const rect = this.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      this.style.setProperty('--mx', x + '%');
+      this.style.setProperty('--my', y + '%');
+    });
+  });
+
+  /* ============================================
+     SCROLL TO TOP
+  ============================================ */
+  const scrollTopBtn = document.getElementById('scrollTop');
+  window.addEventListener('scroll', function() {
+    if (window.scrollY > 400) {
+      scrollTopBtn.classList.add('visible');
+    } else {
+      scrollTopBtn.classList.remove('visible');
+    }
+  }, { passive: true });
+
+  /* ============================================
+     HIGHLIGHT TODAY'S HOURS
+  ============================================ */
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const today = new Date().getDay(); // 0=Sun
+  const dayMap = {0:'Sun',1:'Mon',2:'Tue',3:'Wed',4:'Thu',5:'Fri',6:'Sat'};
+  const todayId = 'hour' + dayMap[today].charAt(0).toUpperCase() + dayMap[today].slice(1);
+  // More robust approach
+  const hourRows = {
+    1: 'hourMon', 2: 'hourTue', 3: 'hourWed', 4: 'hourThu',
+    5: 'hourFri', 6: 'hourSat', 0: 'hourSun'
+  };
+  const todayRow = document.getElementById(hourRows[today]);
+  if (todayRow) todayRow.classList.add('today');
+
+  /* ============================================
+     PARALLAX ON HERO IMAGE
+  ============================================ */
+  const heroImg = document.querySelector('.hero-image-side img');
+  window.addEventListener('scroll', function() {
+    if (heroImg && window.innerWidth > 768) {
+      const scrolled = window.scrollY;
+      heroImg.style.transform = `scale(1.08) translateY(${scrolled * 0.15}px)`;
+    }
+  }, { passive: true });
+
+  /* ============================================
+     STAGGERED MENU ITEM REVEALS
+  ============================================ */
+  const menuItems = document.querySelectorAll('.menu-item');
+  const menuObserver = new IntersectionObserver(function(entries) {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+        menuObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.05 });
+
+  menuItems.forEach((item, i) => {
+    item.style.opacity = '0';
+    item.style.transform = 'translateY(24px)';
+    item.style.transition = `opacity 0.5s ${i * 0.04}s var(--transition), transform 0.5s ${i * 0.04}s var(--transition), border-color 0.3s, background 0.3s, box-shadow 0.3s`;
+    menuObserver.observe(item);
+  });
+
+  /* ============================================
+     DEAL CARD STAGGER
+  ============================================ */
+  const dealCards = document.querySelectorAll('.deal-card');
+  const dealObserver = new IntersectionObserver(function(entries) {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0) scale(1)';
+        dealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  dealCards.forEach((card, i) => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(32px) scale(0.97)';
+    card.style.transition = `opacity 0.6s ${i * 0.1}s var(--transition), transform 0.6s ${i * 0.1}s var(--transition), box-shadow 0.4s`;
+    dealObserver.observe(card);
+  });
+
+  /* ============================================
+     SMOOTH ANCHOR SCROLL
+  ============================================ */
+  document.querySelectorAll('a[href^="#"]').forEach(link => {
+    link.addEventListener('click', function(e) {
+      const href = this.getAttribute('href');
+      if (href === '#') return;
+      const target = document.querySelector(href);
+      if (target) {
+        e.preventDefault();
+        const offset = 72;
+        const top = target.getBoundingClientRect().top + window.scrollY - offset;
+        window.scrollTo({ top, behavior: 'smooth' });
+        closeMobileMenu();
+      }
+    });
+  });
+
+  /* ============================================
+     FEATURE CARD TILT
+  ============================================ */
+  document.querySelectorAll('.feature-card').forEach(card => {
+    card.addEventListener('mousemove', function(e) {
+      const rect = this.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      this.style.transform = `translateY(-6px) rotateX(${-y * 6}deg) rotateY(${x * 6}deg)`;
+    });
+    card.addEventListener('mouseleave', function() {
+      this.style.transform = '';
+    });
+  });
+
+  /* ============================================
+     NUMBERS COUNTER ANIMATION
+  ============================================ */
+  function animateValue(el, start, end, duration, suffix) {
+    const startTime = performance.now();
+    function update(currentTime) {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const value = Math.round(start + (end - start) * eased);
+      el.textContent = value + (suffix || '');
+      if (progress < 1) requestAnimationFrame(update);
+    }
+    requestAnimationFrame(update);
+  }
+
+  const statsObserver = new IntersectionObserver(function(entries) {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        statsObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  /* ============================================
+     REDUCE MOTION RESPECT
+  ============================================ */
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.querySelectorAll('.gallery-track, .reviews-track, .info-strip-inner').forEach(el => {
+      el.style.animationPlayState = 'paused';
+    });
+  }
+
+  /* ============================================
+     PERFORMANCE: PAUSE ANIMATIONS OFF-SCREEN
+  ============================================ */
+  const animatedSections = document.querySelectorAll('#gallery, #reviews, .info-strip');
+  const perfObserver = new IntersectionObserver(function(entries) {
+    entries.forEach(entry => {
+      const tracks = entry.target.querySelectorAll('.gallery-track, .reviews-track, .info-strip-inner');
+      tracks.forEach(track => {
+        track.style.animationPlayState = entry.isIntersecting ? 'running' : 'paused';
+      });
+    });
+  }, { threshold: 0 });
+  animatedSections.forEach(s => perfObserver.observe(s));
+
+})();
+</script>
+</body>
+</html>      
